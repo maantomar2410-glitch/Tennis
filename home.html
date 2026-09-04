@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tennis Analyzer</title>
+</head>
+<body>
+    <h1>Tennis Analyzer</h1>
+
+    <p>Forehand errors: {{ stats.forehand_errors }}</p>
+    <p>Backhand errors: {{ stats.backhand_errors }}</p>
+    <p>Serves in: {{ stats.serves_in }}</p>
+    <p>Serves out: {{ stats.serves_out }}</p>
+    <p>Total errors: {{ total }}</p>
+    <p>Aces: {{ winners }}</p>
+
+    <h2>Log a shot:</h2>
+    <form action="/log" method="POST">
+        <button name="shot" value="forehand_error">Forehand Error</button>
+        <button name="shot" value="backhand_error">Backhand Error</button>
+        <button name="shot" value="serve_in">Serve In</button>
+        <button name="shot" value="serve_out">Serve Out</button>
+        <button name="shot" value="Aces">Aces</button>
+    </form>
+</body>
+</html>
