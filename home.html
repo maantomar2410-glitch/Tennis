@@ -11,7 +11,7 @@
     <p>Serves in: {{ stats.serves_in }}</p>
     <p>Serves out: {{ stats.serves_out }}</p>
     <p>Total errors: {{ total }}</p>
-    <p>Aces: {{ winners }}</p>
+    <p>Aces: {{ stats.aces }}</p>
 
     <h2>Log a shot:</h2>
     <form action="/log" method="POST">
@@ -19,7 +19,7 @@
         <button name="shot" value="backhand_error">Backhand Error</button>
         <button name="shot" value="serve_in">Serve In</button>
         <button name="shot" value="serve_out">Serve Out</button>
-        <button name="shot" value="Aces">Aces</button>
+        <button name="shot" value="aces">Aces</button>
     </form>
 </body>
 </html>
