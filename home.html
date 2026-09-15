@@ -4,22 +4,21 @@
     <title>Tennis Analyzer</title>
 </head>
 <body>
-    <h1>Tennis Analyzer</h1>
+    <h1>{{p1}} vs {{p2}}</h1>
+    <p> Server: {{server}}</p>
 
-    <p>Forehand errors: {{ stats.forehand_errors }}</p>
-    <p>Backhand errors: {{ stats.backhand_errors }}</p>
-    <p>Serves in: {{ stats.serves_in }}</p>
-    <p>Serves out: {{ stats.serves_out }}</p>
-    <p>Total errors: {{ total }}</p>
-    <p>Aces: {{ stats.aces }}</p>
-
-    <h2>Log a shot:</h2>
+    
     <form action="/log" method="POST">
-        <button name="shot" value="forehand_error">Forehand Error</button>
-        <button name="shot" value="backhand_error">Backhand Error</button>
-        <button name="shot" value="serve_in">Serve In</button>
-        <button name="shot" value="serve_out">Serve Out</button>
-        <button name="shot" value="aces">Aces</button>
+        <h3>Which Player:</h3>
+        <input type="radio" name="player" value="{{p1}}" checked> {{p1}}
+        <input type="radio" name="player" value="{{p2}}" > {{p2}}
+        <h3>Which Shot:</h3>
+        <button name="shot" value="Ace">Ace</button>
+        <button name="shot" value="Forehand_error">Forehand Error</button>
+        <button name="shot" value="Backhand_error">Backhand Error</button>
+        <button name="shot" value="Serve_in">Serve In</button>
+        <button name="shot" value="Serve_out">Serve Out</button>
+
     </form>
 </body>
 </html>
