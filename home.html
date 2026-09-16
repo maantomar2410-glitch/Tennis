@@ -20,5 +20,12 @@
         <button name="shot" value="Serve_out">Serve Out</button>
 
     </form>
+    <h2>STATS</h2>
+    <table border="1">
+        <tr><th></th><th>{{p1}}</th><th>{{p2}}</th></tr>
+        <tr><td>Aces</td><td>{{stats.p1_Aces}}</td><td>{{stats.p2_Aces}}</td></tr>
+        <tr><td>Forehand Errors</td><td>{{stats.p1_fh_err}}</td><td>{{stats.p2_fh_err}}</td></tr>
+        <tr><td>Backhand Errors</td><td>{{stats.p1_bh_err}}</td><td>{{stats.p2_bh_err}}</td></tr>
+    </table>
 </body>
 </html>
