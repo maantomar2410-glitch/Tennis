@@ -36,8 +36,25 @@ def start():
     return redirect('/track')
 
 @app.route('/track')
-def track():                              
-    return render_template('home.html', p1=current_match['player1'], p2=current_match['player2'], server=current_match['server'])
+def track():    
+    p1=current_match['player1']
+    p2=current_match['player2']
+    server=current_match['server']
+
+    conn=sqlite3.connect('tennis.db')  
+    cursor=conn.cursor()
+
+    def count(shot_type,player):
+        cursor.execute("SELECT COUNT(*) FROM shots WHERE shot_type=? AND player=?", (shot_type, player))
+        return cursor.fetchone()[0]
+
+    stats={"p1_Aces": count("Ace",p1), "p2_Aces": count("Ace",p2), 'p1_fh_err': count('Forehand_error', p1),
+        'p2_fh_err': count('Forehand_error', p2),
+        'p1_bh_err': count('Backhand_error', p1),
+        'p2_bh_err': count('Backhand_error', p2),}
+
+    conn.close()
+    return render_template('home.html', p1=p1, p2=p2, server=server,stats=stats)
     
 
 @app.route('/log', methods=['POST'])
