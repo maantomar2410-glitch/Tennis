@@ -1,0 +1,37 @@
+body {
+    background-color: #e58183;        
+    font-family: Arial, sans-serif;
+    max-width:800px;             
+    margin: 0 auto;                   
+    padding: 200px;
+}
+
+table {
+    border-collapse: collapse;        
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 8px 12px;                
+    text-align: left;
+    border: 1px solid #ccc;           
+}
+
+th {
+    background-color: #a55a7d;        
+    color: rgb(33, 16, 148);
+}
+
+button {
+    padding: 8px 14px;
+    margin: 3px;
+    background-color: #1b8855;
+    color: white;
+    border: none;
+    border-radius: 4px;               
+    cursor: pointer;                  
+}
+
+button:hover {
+    background-color: #14663f;        
+}
