@@ -8,6 +8,10 @@
     <h1>{{p1}} vs {{p2}}</h1>
     <p> Server: {{server}}</p>
 
+    <form action="/undo" method="POST">
+        <button name="Undo" value="Undo">Undo</button> 
+    </form>
+
     
     <form action="/log" method="POST">
         <h3>Which Player:</h3>
@@ -15,10 +19,18 @@
         <input type="radio" name="player" value="{{p2}}" > {{p2}}
         <h3>Which Shot:</h3>
         <button name="shot" value="Ace">Ace</button>
-        <button name="shot" value="Forehand_error">Forehand Error</button>
-        <button name="shot" value="Backhand_error">Backhand Error</button>
         <button name="shot" value="Serve_in">Serve In</button>
         <button name="shot" value="Serve_out">Serve Out</button>
+        <button name="shot" value="Double_Fault">Double Fault</button>
+        <br>
+        <button name="shot" value="Forehand_error">Forehand Error</button>
+        <button name="shot" value="Backhand_error">Backhand Error</button>
+        <button name="shot" value="Backhand_error_S">Backhand Approach Error</button>
+        <button name="shot" value="Forehand_error_S">Forehand Approach Error</button>
+        <br>
+        <button name="shot" value="Forehand_winner">Forehand Winner</button>
+        <button name="shot" value="Backhand_winner">Backhand Winner</button>
+        <br>
 
     </form>
     <h2>STATS</h2>
