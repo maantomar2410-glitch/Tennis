@@ -82,6 +82,16 @@ def log_shot():
 
     return redirect('/track')
 
+@app.route('/undo', methods=['POST'])
+def undo():
+    conn=sqlite3.connect('tennis.db')  
+    cursor=conn.cursor()
+    cursor.execute("DELETE FROM shots WHERE id = (SELECT MAX(id) FROM shots)")
+    conn.commit()
+    conn.close()
+
+    return redirect('/track')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
