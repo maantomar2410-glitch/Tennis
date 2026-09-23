@@ -3,7 +3,6 @@ import sqlite3
 
 app = Flask(__name__)
 
-
 def init_db():
     conn = sqlite3.connect('tennis.db')       
     cursor = conn.cursor()                     
@@ -15,12 +14,10 @@ def init_db():
 
         )
     ''')
-    conn.commit()                             
+    conn.commit()                              
     conn.close()                               
 
-init_db()  
-
-
+init_db()   
 
 current_match = {}
 
@@ -35,18 +32,10 @@ def start():
     current_match['server'] = request.form['server']
     return redirect('/track')
 
-@app.route('/track')
-def track():    
+
+def get_stats():
     p1=current_match['player1']
     p2=current_match['player2']
-    server_choice = current_match['server']
-
-    if server_choice == 'player1':
-        current_match['server'] = current_match['player1']
-    elif server_choice == 'player2':
-        current_match['server'] = current_match['player2']
-
-    server=current_match['server']
 
     conn=sqlite3.connect('tennis.db')  
     cursor=conn.cursor()
@@ -60,25 +49,44 @@ def track():
         'p1_bh_err': count('Backhand_error', p1),
         'p2_bh_err': count('Backhand_error', p2),
         "p1_serve_in": count("Serve_in",p1),"p1_serve_out": count("Serve_out",p1),
-        "p2_serve_in": count("Serve_in",p2),"p2_serve_out": count("Serve_out",p2),}}
+        "p2_serve_in": count("Serve_in",p2),"p2_serve_out": count("Serve_out",p2),
+        "p1_DF": count("Double_Fault",p1),"p2_DF": count("Double_Fault",p2),
+        "p1_FW": count("Forehand_winner",p1),"p2_FW": count("Forehand_winner",p2),}
 
     conn.close()
-    return render_template('home.html', p1=p1, p2=p2, server=server,stats=stats)
+    return stats
+
+@app.route('/track')
+def track():     
+    p1=current_match['player1']
+    p2=current_match['player2']
+    server_choice = current_match['server']
+
+    if server_choice == 'player1':
+        current_match['server'] = current_match['player1']
+    elif server_choice == 'player2':
+        current_match['server'] = current_match['player2']
+
+    server=current_match['server']
+
+    stats=get_stats()
+
+    return render_template('home.html', p1=p1, p2=p2, server=server, stats=stats)
     
 
 @app.route('/log', methods=['POST'])
 def log_shot():
-    shot = request.form['shot']          
-    player = request.form['player']      
+    shot = request.form['shot']          # which button was clicked
+    player = request.form['player']      # which player is logging the shot
 
-    conn = sqlite3.connect('tennis.db')  
+    conn = sqlite3.connect('tennis.db')  # open the database
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO shots (shot_type, player) VALUES (?, ?)",   
+        "INSERT INTO shots (shot_type, player) VALUES (?, ?)",   # add a row
         (shot, player)
     )
-    conn.commit()                        
-    conn.close()                         
+    conn.commit()                        # save to disk
+    conn.close()                         # close
 
     return redirect('/track')
 
@@ -92,6 +100,8 @@ def undo():
 
     return redirect('/track')
 
+@app.route('/report', methods=['POST'])
+def report():
 
 if __name__ == '__main__':
     app.run(debug=True)
