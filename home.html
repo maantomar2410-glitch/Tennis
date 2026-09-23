@@ -32,14 +32,23 @@
         <button name="shot" value="Backhand_winner">Backhand Winner</button>
         <br>
 
+     
+
+        
+        
+
     </form>
     <h2>STATS</h2>
     <table border="2">
         <tr><th></th><th>{{p1}}</th><th>{{p2}}</th></tr>
         <tr><td>Aces</td><td>{{stats.p1_Aces}}</td><td>{{stats.p2_Aces}}</td></tr>
         <tr><td>Serve %</td><td>{{ "%.2f"|format(stats.p1_serve_in / (stats.p1_serve_in + stats.p1_serve_out) * 100) if (stats.p1_serve_in + stats.p1_serve_out) > 0 else 0 }}</td><td>{{ "%.2f"|format(stats.p2_serve_in / (stats.p2_serve_in + stats.p2_serve_out) * 100) if (stats.p2_serve_in + stats.p2_serve_out) > 0 else 0 }}</td></tr>
+        <tr><td>Double Faults</td><td>{{stats.p1_DF}}</td><td>{{stats.p2_DF}}</td></tr>
         <tr><td>Forehand Errors</td><td>({{stats.p1_fh_err}}){{ "%.2f"|format(stats.p1_fh_err / (stats.p1_fh_err + stats.p1_bh_err) * 100) if (stats.p1_fh_err + stats.p1_bh_err) > 0 else 0 }}</td><td>({{stats.p2_fh_err}}){{ "%.2f"|format(stats.p2_fh_err / (stats.p2_fh_err + stats.p2_bh_err) * 100) if (stats.p2_fh_err + stats.p2_bh_err) > 0 else 0 }}</td></tr>
         <tr><td>Backhand Errors</td><td>({{stats.p1_bh_err}}){{ "%.2f"|format(stats.p1_bh_err / (stats.p1_bh_err + stats.p1_fh_err) * 100) if (stats.p1_bh_err + stats.p1_fh_err) > 0 else 0 }}</td><td>({{stats.p2_bh_err}}){{ "%.2f"|format(stats.p2_bh_err / (stats.p2_bh_err + stats.p2_fh_err) * 100) if (stats.p2_bh_err + stats.p2_fh_err) > 0 else 0 }}</td></tr>
     </table>
+    <form action="/report" method="POST">
+        <button name="submit" value="Report">Report</button>
+    </form>
 </body>
 </html>
