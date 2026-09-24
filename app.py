@@ -32,29 +32,33 @@ def start():
     current_match['server'] = request.form['server']
     return redirect('/track')
 
+SHOT_TYPES = [
+    'Ace', 'Serve_in', 'Serve_fault', 'Double_fault',
+    'UE_FH', 'UE_BH', 'UE_FH_approach', 'UE_BH_approach',
+    'UE_FH_volley', 'UE_BH_volley', 'UE_overhead', 'UE_FH_misc', 'UE_BH_misc',
+    'FE_FH', 'FE_BH', 'FE_FH_approach', 'FE_BH_approach',
+    'FE_FH_volley', 'FE_BH_volley', 'FE_overhead', 'FE_FH_misc', 'FE_BH_misc',
+    'W_FH', 'W_BH', 'W_FH_approach', 'W_BH_approach',
+    'W_FH_volley', 'W_BH_volley', 'W_overhead', 'W_FH_misc', 'W_BH_misc',
+    'Return_FH_winner', 'Return_BH_winner', 'Return_FH_error', 'Return_BH_error',
+]
 
-def get_stats():
-    p1=current_match['player1']
-    p2=current_match['player2']
+def get_all_stats(p1, p2):
+    conn = sqlite3.connect('tennis.db')
+    cursor = conn.cursor()
 
-    conn=sqlite3.connect('tennis.db')  
-    cursor=conn.cursor()
-
-    def count(shot_type,player):
-        cursor.execute("SELECT COUNT(*) FROM shots WHERE shot_type=? AND player=?", (shot_type, player))
+    def count_exact(shot_type, player):
+        cursor.execute("SELECT COUNT(*) FROM shots WHERE shot_type = ? AND player = ?",
+                       (shot_type, player))
         return cursor.fetchone()[0]
 
-    stats={"p1_Aces": count("Ace",p1), "p2_Aces": count("Ace",p2), 'p1_fh_err': count('Forehand_error', p1),
-        'p2_fh_err': count('Forehand_error', p2),
-        'p1_bh_err': count('Backhand_error', p1),
-        'p2_bh_err': count('Backhand_error', p2),
-        "p1_serve_in": count("Serve_in",p1),"p1_serve_out": count("Serve_out",p1),
-        "p2_serve_in": count("Serve_in",p2),"p2_serve_out": count("Serve_out",p2),
-        "p1_DF": count("Double_Fault",p1),"p2_DF": count("Double_Fault",p2),
-        "p1_FW": count("Forehand_winner",p1),"p2_FW": count("Forehand_winner",p2),}
+    
+    detailed = {}
+    for st in SHOT_TYPES:
+        detailed[st] = {'p1': count_exact(st, p1), 'p2': count_exact(st, p2)}
 
     conn.close()
-    return stats
+    return detailed
 
 @app.route('/track')
 def track():     
@@ -69,24 +73,24 @@ def track():
 
     server=current_match['server']
 
-    stats=get_stats()
+    stats=get_all_stats(p1, p2)
 
     return render_template('home.html', p1=p1, p2=p2, server=server, stats=stats)
     
 
 @app.route('/log', methods=['POST'])
 def log_shot():
-    shot = request.form['shot']          # which button was clicked
-    player = request.form['player']      # which player is logging the shot
+    shot = request.form['shot']          
+    player = request.form['player']      
 
-    conn = sqlite3.connect('tennis.db')  # open the database
+    conn = sqlite3.connect('tennis.db')  
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO shots (shot_type, player) VALUES (?, ?)",   # add a row
+        "INSERT INTO shots (shot_type, player) VALUES (?, ?)",   
         (shot, player)
     )
-    conn.commit()                        # save to disk
-    conn.close()                         # close
+    conn.commit()                        
+    conn.close()                         
 
     return redirect('/track')
 
@@ -100,8 +104,14 @@ def undo():
 
     return redirect('/track')
 
-@app.route('/report', methods=['POST'])
+@app.route('/report')
 def report():
+    stats=get_all_stats(current_match['player1'], current_match['player2'])
+    p1=current_match['player1']
+    p2=current_match['player2']
+    server=current_match['server']
+
+    return render_template('report.html', p1=p1, p2=p2, server=server, stats=stats)
 
 if __name__ == '__main__':
     app.run(debug=True)
