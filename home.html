@@ -13,24 +13,88 @@
     </form>
 
     
-    <form action="/log" method="POST">
-        <h3>Which Player:</h3>
-        <input type="radio" name="player" value="{{p1}}" checked> {{p1}}
-        <input type="radio" name="player" value="{{p2}}" > {{p2}}
-        <h3>Which Shot:</h3>
-        <button name="shot" value="Ace">Ace</button>
-        <button name="shot" value="Serve_in">Serve In</button>
-        <button name="shot" value="Serve_out">Serve Out</button>
-        <button name="shot" value="Double_Fault">Double Fault</button>
-        <br>
-        <button name="shot" value="Forehand_error">Forehand Error</button>
-        <button name="shot" value="Backhand_error">Backhand Error</button>
-        <button name="shot" value="Backhand_error_S">Backhand Approach Error</button>
-        <button name="shot" value="Forehand_error_S">Forehand Approach Error</button>
-        <br>
-        <button name="shot" value="Forehand_winner">Forehand Winner</button>
-        <button name="shot" value="Backhand_winner">Backhand Winner</button>
-        <br>
+    <h3>What happened?</h3>
+
+<!-- Player selector -->
+<input type="radio" name="player_choice" value="{{p1}}" id="pc1" checked> {{p1}}
+<input type="radio" name="player_choice" value="{{p2}}" id="pc2"> {{p2}}
+<br><br>
+
+<!-- Category buttons -->
+<button type="button" onclick="show('serve_box')">Serve</button>
+<button type="button" onclick="show('unforced_box')">Unforced Error</button>
+<button type="button" onclick="show('forced_box')">Forced Error</button>
+<button type="button" onclick="show('winner_box')">Winner</button>
+<button type="button" onclick="show('return_box')">Return</button>
+
+<!-- SERVE -->
+<div id="serve_box" style="display:none;">
+    <h4>Serve:</h4>
+    <button type="button" onclick="logShot('Ace')">Ace</button>
+    <button type="button" onclick="logShot('Serve_in')">In</button>
+    <button type="button" onclick="logShot('Serve_fault')">Fault</button>
+    <button type="button" onclick="logShot('Double_fault')">Double Fault</button>
+</div>
+
+<!-- UNFORCED ERROR -->
+<div id="unforced_box" style="display:none;">
+    <h4>Unforced Error on:</h4>
+    <button type="button" onclick="logShot('UE_FH')">FH</button>
+    <button type="button" onclick="logShot('UE_BH')">BH</button>
+    <button type="button" onclick="logShot('UE_FH_approach')">FH Approach</button>
+    <button type="button" onclick="logShot('UE_BH_approach')">BH Approach</button>
+    <button type="button" onclick="logShot('UE_FH_volley')">FH Volley</button>
+    <button type="button" onclick="logShot('UE_BH_volley')">BH Volley</button>
+    <button type="button" onclick="logShot('UE_overhead')">Overhead</button>
+    <button type="button" onclick="logShot('UE_FH_misc')">FH Misc</button>
+    <button type="button" onclick="logShot('UE_BH_misc')">BH Misc</button>
+</div>
+
+<!-- FORCED ERROR -->
+<div id="forced_box" style="display:none;">
+    <h4>Forced Error on:</h4>
+    <button type="button" onclick="logShot('FE_FH')">FH</button>
+    <button type="button" onclick="logShot('FE_BH')">BH</button>
+    <button type="button" onclick="logShot('FE_FH_approach')">FH Approach</button>
+    <button type="button" onclick="logShot('FE_BH_approach')">BH Approach</button>
+    <button type="button" onclick="logShot('FE_FH_volley')">FH Volley</button>
+    <button type="button" onclick="logShot('FE_BH_volley')">BH Volley</button>
+    <button type="button" onclick="logShot('FE_overhead')">Overhead</button>
+    <button type="button" onclick="logShot('FE_FH_misc')">FH Misc</button>
+    <button type="button" onclick="logShot('FE_BH_misc')">BH Misc</button>
+</div>
+
+<!-- WINNER -->
+<div id="winner_box" style="display:none;">
+    <h4>Winner on:</h4>
+    <button type="button" onclick="logShot('W_FH')">FH</button>
+    <button type="button" onclick="logShot('W_BH')">BH</button>
+    <button type="button" onclick="logShot('W_FH_approach')">FH Approach</button>
+    <button type="button" onclick="logShot('W_BH_approach')">BH Approach</button>
+    <button type="button" onclick="logShot('W_FH_volley')">FH Volley</button>
+    <button type="button" onclick="logShot('W_BH_volley')">BH Volley</button>
+    <button type="button" onclick="logShot('W_overhead')">Overhead</button>
+    <button type="button" onclick="logShot('W_FH_misc')">FH Misc</button>
+    <button type="button" onclick="logShot('W_BH_misc')">BH Misc</button>
+</div>
+
+<!-- RETURN -->
+<!-- RETURN -->
+<div id="return_box" style="display:none;">
+    <h4>Return:</h4>
+    <button type="button" onclick="logShot('Return_FH_winner')">FH Return Winner</button>
+    <button type="button" onclick="logShot('Return_BH_winner')">BH Return Winner</button>
+    <button type="button" onclick="logShot('Return_FH_error')">FH Return Error</button>
+    <button type="button" onclick="logShot('Return_BH_error')">BH Return Error</button>
+</div>
+
+<!-- I removed Return_in (in-play) since you didn't mention it -->
+
+<!-- Hidden form that submits -->
+<form action="/log" method="POST" id="logForm">
+    <input type="hidden" name="shot" id="shotField">
+    <input type="hidden" name="player" id="playerField">
+</form>
 
      
 
@@ -47,7 +111,27 @@
         <tr><td>Forehand Errors</td><td>({{stats.p1_fh_err}}){{ "%.2f"|format(stats.p1_fh_err / (stats.p1_fh_err + stats.p1_bh_err) * 100) if (stats.p1_fh_err + stats.p1_bh_err) > 0 else 0 }}</td><td>({{stats.p2_fh_err}}){{ "%.2f"|format(stats.p2_fh_err / (stats.p2_fh_err + stats.p2_bh_err) * 100) if (stats.p2_fh_err + stats.p2_bh_err) > 0 else 0 }}</td></tr>
         <tr><td>Backhand Errors</td><td>({{stats.p1_bh_err}}){{ "%.2f"|format(stats.p1_bh_err / (stats.p1_bh_err + stats.p1_fh_err) * 100) if (stats.p1_bh_err + stats.p1_fh_err) > 0 else 0 }}</td><td>({{stats.p2_bh_err}}){{ "%.2f"|format(stats.p2_bh_err / (stats.p2_bh_err + stats.p2_fh_err) * 100) if (stats.p2_bh_err + stats.p2_fh_err) > 0 else 0 }}</td></tr>
     </table>
-    <form action="/report" method="POST">
+
+        <script>
+function show(id) {
+    var boxes = ['serve_box', 'unforced_box', 'forced_box', 'winner_box', 'return_box'];
+    for (var i = 0; i < boxes.length; i++) {
+        document.getElementById(boxes[i]).style.display = 'none';
+    }
+    document.getElementById(id).style.display = 'block';
+}
+
+function logShot(shotValue) {
+    var player = document.getElementById('pc1').checked
+                 ? document.getElementById('pc1').value
+                 : document.getElementById('pc2').value;
+    document.getElementById('shotField').value = shotValue;
+    document.getElementById('playerField').value = player;
+    document.getElementById('logForm').submit();
+}
+    </script>
+</body>
+    <form action="/report">
         <button name="submit" value="Report">Report</button>
     </form>
 </body>
