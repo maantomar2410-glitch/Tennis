@@ -118,118 +118,87 @@ p1_gc=0
 p2_gc=0
 p1_set=0
 p2_set=0
-def update_score(shot,player):
-    game_score=[0,15,30,40,'A']
-    game_count=[0,1,2,3,4,5,6,7]
-    set_count=[0,1,2]  
+def update_score(shot, player):
     global p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set, DEUCE, TIEBRAKE, tie_p1, tie_p2
 
-    if shot in points_won and DEUCE==False and TIEBRAKE==False:
-        if player == current_match['player1']:
-            if p1_gs == 3 and p2_gs < 3:    
-                p1_gc += 1
-                p1_gs = 0
-                p2_gs = 0
-            else:
-                p1_gs += 1
-        else:
-            if p2_gs == 3 and p1_gs < 3:
-                p2_gc += 1
-                p1_gs = 0
-                p2_gs = 0
-            else:
-                p2_gs += 1
+    p1name = current_match['player1']
 
-    if shot in points_won and DEUCE==True and TIEBRAKE==False:
-            if player == current_match['player1'] and p1_gs>p2_gs:
-                p1_gc += 1
-                p1_gs = 0
-                p2_gs = 0
-                DEUCE = False
-    
-            elif player == current_match['player1'] and p2_gs>p1_gs:
-                p1_gc -= 1
-    
-            elif player == current_match['player2'] and p2_gs>p1_gs:
-                p2_gc += 1
-                p1_gs = 0
-                p2_gs = 0
-                DEUCE = False
-    
-            elif player == current_match['player2'] and p1_gs>p2_gs:
-                p2_gc -= 1
+    # ===== Who won the point? =====
+    if shot in points_won:
+        winner = player
+    else:
+        winner = current_match['player2'] if player == p1name else p1name
 
-    elif shot not in points_won and DEUCE==True and TIEBRAKE==False:
-            if player == current_match['player1'] and p1_gs>p2_gs:
-                p1_gc -= 1
-    
-            elif player == current_match['player1'] and p2_gs>p1_gs:
-                p2_gc += 1
-                p1_gs = 0
-                p2_gs = 0
-                DEUCE = False
-    
-            elif player == current_match['player2'] and p2_gs>p1_gs:
-                p2_gc -= 1
-    
-            elif player == current_match['player2'] and p1_gs>p2_gs:
-                p1_gc += 1
-                p1_gs = 0
-                p2_gs = 0
-                DEUCE = False
-
-    # Count tiebreak points
-# Count tiebreak points
+    # ===== TIEBREAK =====
     if TIEBRAKE:
-        if shot in points_won:
-            if player == current_match['player1']:
-                tie_p1 += 1
-            else:
-                tie_p2 += 1
-        else:   # error → opponent gets the point
-            if player == current_match['player1']:
-                tie_p2 += 1
-            else:
-                tie_p1 += 1
+        if winner == p1name:
+            tie_p1 += 1
+        else:
+            tie_p2 += 1
 
-        # Win conditions — first to 7, win by 2
         if tie_p1 >= 7 and tie_p1 - tie_p2 >= 2:
             p1_set += 1
             tie_p1 = tie_p2 = 0
-            p1_gc = p2_gc = 0        # reset games for next set
+            p1_gc = p2_gc = 0
             TIEBRAKE = False
         elif tie_p2 >= 7 and tie_p2 - tie_p1 >= 2:
             p2_set += 1
             tie_p1 = tie_p2 = 0
             p1_gc = p2_gc = 0
             TIEBRAKE = False
-  
+        return      # tiebreak handled — stop here
 
-    if p1_gs >= 4 and p1_gs - p2_gs >= 2:
-            p1_gc += 1
-            p1_gs = 0
-            p2_gs = 0
-    
-    if p2_gs >= 4 and p2_gs - p1_gs >= 2:
-            p2_gc += 1
-            p1_gs = 0
-            p2_gs = 0
-    
-    if p1_gs>=4 or p2_gs>=4 and abs(p1_gs-p2_gs)==1:
-            DEUCE=True
+    # ===== DEUCE / ADVANTAGE =====
+    if DEUCE:
+        if winner == p1name:
+            if p1_gs == 4:                # P1 had advantage → win game
+                p1_gc += 1
+                p1_gs = p2_gs = 0
+                DEUCE = False
+            elif p2_gs == 4:              # P2 had adv, P1 wins → back to deuce
+                p1_gs = p2_gs = 3
+            else:                         # from deuce → P1 advantage
+                p1_gs = 4
+        else:
+            if p2_gs == 4:                # P2 had advantage → win game
+                p2_gc += 1
+                p1_gs = p2_gs = 0
+                DEUCE = False
+            elif p1_gs == 4:              # P1 had adv, P2 wins → back to deuce
+                p1_gs = p2_gs = 3
+            else:                         # from deuce → P2 advantage
+                p2_gs = 4
 
+    # ===== NORMAL PLAY =====
+    else:
+        if winner == p1name:
+            if p1_gs == 3 and p2_gs < 3:  # at 40, opponent below → win game
+                p1_gc += 1
+                p1_gs = p2_gs = 0
+            else:
+                p1_gs += 1
+        else:
+            if p2_gs == 3 and p1_gs < 3:
+                p2_gc += 1
+                p1_gs = p2_gs = 0
+            else:
+                p2_gs += 1
+
+        # reached 40-40? → deuce
+        if p1_gs == 3 and p2_gs == 3:
+            DEUCE = True
+
+    # ===== GAMES → SETS =====
     if p1_gc >= 6 and p1_gc - p2_gc >= 2:
-            p1_set += 1
-            p1_gc = 0
-            p2_gc = 0
-    
+        p1_set += 1
+        p1_gc = p2_gc = 0
     if p2_gc >= 6 and p2_gc - p1_gc >= 2:
-            p2_set += 1  
-            p1_gc = 0
-            p2_gc = 0
-    
+        p2_set += 1
+        p1_gc = p2_gc = 0
+
+    # 6-6 in games → tiebreak
     if p1_gc == 6 and p2_gc == 6:
-            TIEBRAKE=True
+        TIEBRAKE = True
 
 
 @app.route('/log', methods=['POST'])
