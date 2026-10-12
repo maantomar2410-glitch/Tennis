@@ -96,21 +96,27 @@
     <input type="hidden" name="player" id="playerField">
 </form>
 
+
+    <div style="display: flex; gap: 40px;">
+        <h2>Score</h2>
+        <table border="2">
+            <tr><th></th>{% for s in set_history %}<th>Set{{loop.index}}</th>{% endfor %}</tr>
+            <tr><td>{{p1}}</td>{% for s in set_history %}<td>{{s[0]}}</td>{% endfor %}</tr>
+            <tr><td>{{p2}}</td>{% for s in set_history %}<td>{{s[1]}}</td>{% endfor %}</tr>
+
+        </table>
      
-
-        
-        
-
-    </form>
-    <h2>STATS</h2>
-    <table border="2">
-        <tr><th></th><th>{{p1}}</th><th>{{p2}}</th></tr>
-        <tr><td>Aces</td><td>{{stats.p1_Aces}}</td><td>{{stats.p2_Aces}}</td></tr>
-        <tr><td>Serve %</td><td>{{ "%.2f"|format(stats.p1_serve_in / (stats.p1_serve_in + stats.p1_serve_out) * 100) if (stats.p1_serve_in + stats.p1_serve_out) > 0 else 0 }}</td><td>{{ "%.2f"|format(stats.p2_serve_in / (stats.p2_serve_in + stats.p2_serve_out) * 100) if (stats.p2_serve_in + stats.p2_serve_out) > 0 else 0 }}</td></tr>
-        <tr><td>Double Faults</td><td>{{stats.p1_DF}}</td><td>{{stats.p2_DF}}</td></tr>
-        <tr><td>Forehand Errors</td><td>({{stats.p1_fh_err}}){{ "%.2f"|format(stats.p1_fh_err / (stats.p1_fh_err + stats.p1_bh_err) * 100) if (stats.p1_fh_err + stats.p1_bh_err) > 0 else 0 }}</td><td>({{stats.p2_fh_err}}){{ "%.2f"|format(stats.p2_fh_err / (stats.p2_fh_err + stats.p2_bh_err) * 100) if (stats.p2_fh_err + stats.p2_bh_err) > 0 else 0 }}</td></tr>
-        <tr><td>Backhand Errors</td><td>({{stats.p1_bh_err}}){{ "%.2f"|format(stats.p1_bh_err / (stats.p1_bh_err + stats.p1_fh_err) * 100) if (stats.p1_bh_err + stats.p1_fh_err) > 0 else 0 }}</td><td>({{stats.p2_bh_err}}){{ "%.2f"|format(stats.p2_bh_err / (stats.p2_bh_err + stats.p2_fh_err) * 100) if (stats.p2_bh_err + stats.p2_fh_err) > 0 else 0 }}</td></tr>
-    </table>
+    
+        <h2>STATS</h2>
+        <table border="2">
+            <tr><th></th><th>{{p1}}</th><th>{{p2}}</th></tr>
+            <tr><td>Aces</td><td>{{stats.p1_Aces}}</td><td>{{stats.p2_Aces}}</td></tr>
+            <tr><td>Double Faults</td><td>{{stats.p1_Double_Fault}}</td><td>{{stats.p2_Double_Fault}}</td></tr>
+            <tr><td>Serve %</td><td>{{stats.p1_Serve_in}}</td><td>{{stats.p2_Serve_in}}</td></tr>
+            <tr><td>Unforced Errors</td><td>{{stats.p1_UE}}</td><td>{{stats.p2_UE}}</td></tr>
+            <tr><td>Forced Errors</td><td>{{stats.p1_FE}}</td><td>{{stats.p2_FE}}</td></tr>
+            <tr><td>Winners</td><td>{{stats.p1_W}}</td><td>{{stats.p2_W}}</td></tr>
+        </table>
 
         <script>
 function show(id) {
