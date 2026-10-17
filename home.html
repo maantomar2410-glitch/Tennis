@@ -100,10 +100,9 @@
     <div style="display: flex; gap: 40px;">
         <h2>Score</h2>
         <table border="2">
-            <tr><th></th>{% for s in set_history %}<th>Set{{loop.index}}</th>{% endfor %}</tr>
-            <tr><td>{{p1}}</td>{% for s in set_history %}<td>{{s[0]}}</td>{% endfor %}</tr>
-            <tr><td>{{p2}}</td>{% for s in set_history %}<td>{{s[1]}}</td>{% endfor %}</tr>
-
+            <tr><th></th>{% for s in set_history %}<th>Set{{loop.index}}</th>{% endfor %}<th>Current Set</th><th>{%if tiebreak %}Tiebreak Score{% else %}Game Score{% endif %}</th></tr>
+            <tr><td>{{p1}}</td>{% for s in set_history %}<td>{{s[0]}}</td>{% endfor %}<th>{{current_set[0]}}</th><th>{% if tiebreak %}{{tie_p1}}{% else %}{{p1_score}}{% endif %}</th></tr>
+            <tr><td>{{p2}}</td>{% for s in set_history %}<td>{{s[1]}}</td>{% endfor %}<th>{{current_set[1]}}</th><th>{% if tiebreak %}{{tie_p2}}{% else %}{{p2_score}}{% endif %}</th></tr>
         </table>
      
     
