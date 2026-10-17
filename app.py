@@ -31,6 +31,8 @@ p2_gc=0
 p1_set=0
 p2_set=0
 set_history=[]
+current_set=[p1_gc, p2_gc]
+game_score=[0,15,30,40,"A"]
 
 
 @app.route('/')
@@ -116,15 +118,17 @@ def track():
     server=current_match['server']
 
     summary,detailed=get_all_stats(p1, p2)
-    player1_score=[p1_set,p1_gc,p1_gs]
-    player2_score=[p2_set,p2_gc,p2_gs]
+    player1_score=game_score[p1_gs] 
+    player2_score=game_score[p2_gs]
+    set_score_p1=p1_gc
+    set_score_p2=p2_gc
 
 
-    return render_template('home.html', p1=p1, p2=p2, server=server, stats=summary, p1_score=player1_score, p2_score=player2_score, tie_p1=tie_p1, tie_p2=tie_p2,set_history=set_history)
+    return render_template('home.html', p1=p1, p2=p2, server=server, stats=summary, p1_score=player1_score, p2_score=player2_score, tie_p1=tie_p1, tie_p2=tie_p2,set_history=set_history, p1_gc=set_score_p1, p2_gc=set_score_p2,current_set=current_set, tiebreak=TIEBRAKE)
     
 
 def update_score(shot, player):
-    global p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set, DEUCE, TIEBRAKE, tie_p1, tie_p2 
+    global p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set, DEUCE, TIEBRAKE, tie_p1, tie_p2 , set_history , current_set
 
     p1name = current_match['player1']
 
@@ -144,16 +148,20 @@ def update_score(shot, player):
 
         if tie_p1 >= 7 and tie_p1 - tie_p2 >= 2:
             p1_set += 1
+            p1_gc=7
             set_history.append([p1_gc, p2_gc])
             tie_p1 = tie_p2 = 0
             p1_gc = p2_gc = 0
-            
+            current_set=[p1_gc, p2_gc]
+
             TIEBRAKE = False
         elif tie_p2 >= 7 and tie_p2 - tie_p1 >= 2:
             p2_set += 1
+            p2_gc=7
             set_history.append([p1_gc, p2_gc])
             tie_p1 = tie_p2 = 0
             p1_gc = p2_gc = 0
+            current_set=[p1_gc, p2_gc]
             TIEBRAKE = False
         return      
 
@@ -161,6 +169,7 @@ def update_score(shot, player):
         if winner == p1name:
             if p1_gs == 4:                # P1 had advantage → win game
                 p1_gc += 1
+                current_set=[p1_gc, p2_gc]
                 p1_gs = p2_gs = 0
                 DEUCE = False
             elif p2_gs == 4:              # P2 had adv, P1 wins → back to deuce
@@ -170,6 +179,7 @@ def update_score(shot, player):
         else:
             if p2_gs == 4:                # P2 had advantage → win game
                 p2_gc += 1
+                current_set=[p1_gc, p2_gc]
                 p1_gs = p2_gs = 0
                 DEUCE = False
             elif p1_gs == 4:              # P1 had adv, P2 wins → back to deuce
@@ -181,12 +191,14 @@ def update_score(shot, player):
         if winner == p1name:
             if p1_gs == 3 and p2_gs < 3:  # at 40, opponent below → win game
                 p1_gc += 1
+                current_set=[p1_gc, p2_gc]
                 p1_gs = p2_gs = 0
             else:
                 p1_gs += 1
         else:
             if p2_gs == 3 and p1_gs < 3:
                 p2_gc += 1
+                current_set=[p1_gc, p2_gc]
                 p1_gs = p2_gs = 0
             else:
                 p2_gs += 1
@@ -199,14 +211,17 @@ def update_score(shot, player):
         p1_set += 1
         set_history.append([p1_gc, p2_gc])
         p1_gc = p2_gc = 0
+        current_set=[p1_gc, p2_gc]
     if p2_gc >= 6 and p2_gc - p1_gc >= 2:
         p2_set += 1
         set_history.append([p1_gc, p2_gc])
         p1_gc = p2_gc = 0
+        current_set=[p1_gc, p2_gc]
+
 
     if p1_gc == 6 and p2_gc == 6:
         TIEBRAKE = True
-    return [p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set,tie_p1, tie_p2]
+
 
 
 @app.route('/log', methods=['POST'])
@@ -239,12 +254,12 @@ def undo():
 
 @app.route('/report')
 def report():
-    stats=get_all_stats(current_match['player1'], current_match['player2'])
     p1=current_match['player1']
     p2=current_match['player2']
-    server=current_match['server']
+    
+    summary,detailed=get_all_stats(p1,p2)
 
-    return render_template('report.html', p1=p1, p2=p2, server=server, stats=stats)
+    return render_template('report.html', p1=p1, p2=p2, detailed=detailed)
 
 if __name__ == '__main__':
     app.run(debug=True)
