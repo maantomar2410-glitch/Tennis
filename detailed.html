@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MATCH REPORT</title>
+        <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    </head>
+    <body>
+        <h1>Detailed Match Report</h1>
+        <table border="1">
+            <tr><th>SHOT TYPE</th><th>{{p1}}</th><th>{{p2}}</th></tr>
+            {% for shot_type, counts in detailed.items() %}<tr><td>{{ shot_type }}</td><td>{{ counts.p1 }}</td><td>{{ counts.p2 }}</td></tr>
+            {% endfor %}
+        </table>
+        <a href="/track"><button>Back to Match</button></a>
+    </body>
+</html>
