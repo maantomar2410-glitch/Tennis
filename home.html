@@ -2,142 +2,145 @@
 <html>
 <head>
     <title>Tennis Analyzer</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <h1>{{p1}} vs {{p2}}</h1>
     <p> Server: {{server}}</p>
 
     <form action="/undo" method="POST">
-        <button name="Undo" value="Undo">Undo</button> 
+        <button name="Undo" value="Undo">Undo</button>
     </form>
 
-    
     <h3>What happened?</h3>
 
-<!-- Player selector -->
-<input type="radio" name="player_choice" value="{{p1}}" id="pc1" checked> {{p1}}
-<input type="radio" name="player_choice" value="{{p2}}" id="pc2"> {{p2}}
-<br><br>
+    <!-- Player selector (ids pc1/pc2 are required by the JavaScript) -->
+    <input type="radio" name="player_choice" value="{{p1}}" id="pc1" {% if server == p1 %}checked{% endif %}> {{p1}}
+    <input type="radio" name="player_choice" value="{{p2}}" id="pc2" {% if server == p2 %}checked{% endif %}> {{p2}}
+    <br><br>
 
-<!-- Category buttons -->
-<button type="button" onclick="show('serve_box')">Serve</button>
-<button type="button" onclick="show('unforced_box')">Unforced Error</button>
-<button type="button" onclick="show('forced_box')">Forced Error</button>
-<button type="button" onclick="show('winner_box')">Winner</button>
-<button type="button" onclick="show('return_box')">Return</button>
+    <!-- Category buttons -->
+    <button type="button" onclick="show('serve_box')">Serve</button>
+    <button type="button" onclick="show('unforced_box')">Unforced Error</button>
+    <button type="button" onclick="show('forced_box')">Forced Error</button>
+    <button type="button" onclick="show('winner_box')">Winner</button>
+    <button type="button" onclick="show('return_box')">Return</button>
 
-<!-- SERVE -->
-<div id="serve_box" style="display:none;">
-    <h4>Serve:</h4>
-    <button type="button" onclick="logShot('Ace')">Ace</button>
-    <button type="button" onclick="logShot('Serve_in')">In</button>
-    <button type="button" onclick="logShot('Serve_fault')">Fault</button>
-    <button type="button" onclick="logShot('Double_fault')">Double Fault</button>
-</div>
+    <!-- SERVE -->
+    <div id="serve_box" style="display:none;">
+        <h4>Serve:</h4>
+        <button type="button" onclick="logShot('Ace')">Ace</button>
+        <button type="button" onclick="logShot('Serve_in')">In</button>
+        <button type="button" onclick="logShot('Serve_fault')">Fault</button>
+        <button type="button" onclick="logShot('Double_fault')">Double Fault</button>
+    </div>
 
-<!-- UNFORCED ERROR -->
-<div id="unforced_box" style="display:none;">
-    <h4>Unforced Error on:</h4>
-    <button type="button" onclick="logShot('UE_FH')">FH</button>
-    <button type="button" onclick="logShot('UE_BH')">BH</button>
-    <button type="button" onclick="logShot('UE_FH_approach')">FH Approach</button>
-    <button type="button" onclick="logShot('UE_BH_approach')">BH Approach</button>
-    <button type="button" onclick="logShot('UE_FH_volley')">FH Volley</button>
-    <button type="button" onclick="logShot('UE_BH_volley')">BH Volley</button>
-    <button type="button" onclick="logShot('UE_overhead')">Overhead</button>
-    <button type="button" onclick="logShot('UE_FH_misc')">FH Misc</button>
-    <button type="button" onclick="logShot('UE_BH_misc')">BH Misc</button>
-</div>
+    <!-- UNFORCED ERROR -->
+    <div id="unforced_box" style="display:none;">
+        <h4>Unforced Error on:</h4>
+        <button type="button" onclick="logShot('UE_FH')">FH</button>
+        <button type="button" onclick="logShot('UE_BH')">BH</button>
+        <button type="button" onclick="logShot('UE_FH_approach')">FH Approach</button>
+        <button type="button" onclick="logShot('UE_BH_approach')">BH Approach</button>
+        <button type="button" onclick="logShot('UE_FH_volley')">FH Volley</button>
+        <button type="button" onclick="logShot('UE_BH_volley')">BH Volley</button>
+        <button type="button" onclick="logShot('UE_overhead')">Overhead</button>
+        <button type="button" onclick="logShot('UE_FH_misc')">FH Misc</button>
+        <button type="button" onclick="logShot('UE_BH_misc')">BH Misc</button>
+    </div>
 
-<!-- FORCED ERROR -->
-<div id="forced_box" style="display:none;">
-    <h4>Forced Error on:</h4>
-    <button type="button" onclick="logShot('FE_FH')">FH</button>
-    <button type="button" onclick="logShot('FE_BH')">BH</button>
-    <button type="button" onclick="logShot('FE_FH_approach')">FH Approach</button>
-    <button type="button" onclick="logShot('FE_BH_approach')">BH Approach</button>
-    <button type="button" onclick="logShot('FE_FH_volley')">FH Volley</button>
-    <button type="button" onclick="logShot('FE_BH_volley')">BH Volley</button>
-    <button type="button" onclick="logShot('FE_overhead')">Overhead</button>
-    <button type="button" onclick="logShot('FE_FH_misc')">FH Misc</button>
-    <button type="button" onclick="logShot('FE_BH_misc')">BH Misc</button>
-</div>
+    <!-- FORCED ERROR -->
+    <div id="forced_box" style="display:none;">
+        <h4>Forced Error on:</h4>
+        <button type="button" onclick="logShot('FE_FH')">FH</button>
+        <button type="button" onclick="logShot('FE_BH')">BH</button>
+        <button type="button" onclick="logShot('FE_FH_approach')">FH Approach</button>
+        <button type="button" onclick="logShot('FE_BH_approach')">BH Approach</button>
+        <button type="button" onclick="logShot('FE_FH_volley')">FH Volley</button>
+        <button type="button" onclick="logShot('FE_BH_volley')">BH Volley</button>
+        <button type="button" onclick="logShot('FE_overhead')">Overhead</button>
+        <button type="button" onclick="logShot('FE_FH_misc')">FH Misc</button>
+        <button type="button" onclick="logShot('FE_BH_misc')">BH Misc</button>
+    </div>
 
-<!-- WINNER -->
-<div id="winner_box" style="display:none;">
-    <h4>Winner on:</h4>
-    <button type="button" onclick="logShot('W_FH')">FH</button>
-    <button type="button" onclick="logShot('W_BH')">BH</button>
-    <button type="button" onclick="logShot('W_FH_approach')">FH Approach</button>
-    <button type="button" onclick="logShot('W_BH_approach')">BH Approach</button>
-    <button type="button" onclick="logShot('W_FH_volley')">FH Volley</button>
-    <button type="button" onclick="logShot('W_BH_volley')">BH Volley</button>
-    <button type="button" onclick="logShot('W_overhead')">Overhead</button>
-    <button type="button" onclick="logShot('W_FH_misc')">FH Misc</button>
-    <button type="button" onclick="logShot('W_BH_misc')">BH Misc</button>
-</div>
+    <!-- WINNER -->
+    <div id="winner_box" style="display:none;">
+        <h4>Winner on:</h4>
+        <button type="button" onclick="logShot('W_FH')">FH</button>
+        <button type="button" onclick="logShot('W_BH')">BH</button>
+        <button type="button" onclick="logShot('W_FH_approach')">FH Approach</button>
+        <button type="button" onclick="logShot('W_BH_approach')">BH Approach</button>
+        <button type="button" onclick="logShot('W_FH_volley')">FH Volley</button>
+        <button type="button" onclick="logShot('W_BH_volley')">BH Volley</button>
+        <button type="button" onclick="logShot('W_overhead')">Overhead</button>
+        <button type="button" onclick="logShot('W_FH_misc')">FH Misc</button>
+        <button type="button" onclick="logShot('W_BH_misc')">BH Misc</button>
+    </div>
 
-<!-- RETURN -->
-<!-- RETURN -->
-<div id="return_box" style="display:none;">
-    <h4>Return:</h4>
-    <button type="button" onclick="logShot('Return_FH_winner')">FH Return Winner</button>
-    <button type="button" onclick="logShot('Return_BH_winner')">BH Return Winner</button>
-    <button type="button" onclick="logShot('Return_FH_error')">FH Return Error</button>
-    <button type="button" onclick="logShot('Return_BH_error')">BH Return Error</button>
-</div>
+    <!-- RETURN -->
+    <div id="return_box" style="display:none;">
+        <h4>Return:</h4>
+        <button type="button" onclick="logShot('Return_FH_winner')">FH Return Winner</button>
+        <button type="button" onclick="logShot('Return_BH_winner')">BH Return Winner</button>
+        <button type="button" onclick="logShot('Return_FH_error')">FH Return Error</button>
+        <button type="button" onclick="logShot('Return_BH_error')">BH Return Error</button>
+    </div>
 
-<!-- I removed Return_in (in-play) since you didn't mention it -->
-
-<!-- Hidden form that submits -->
-<form action="/log" method="POST" id="logForm">
-    <input type="hidden" name="shot" id="shotField">
-    <input type="hidden" name="player" id="playerField">
-</form>
-
+    <!-- Hidden form that submits -->
+    <form action="/log" method="POST" id="logForm">
+        <input type="hidden" name="shot" id="shotField">
+        <input type="hidden" name="player" id="playerField">
+    </form>
 
     <div style="display: flex; gap: 40px;">
-        <h2>Score</h2>
-        <table border="2">
-            <tr><th></th>{% for s in set_history %}<th>Set{{loop.index}}</th>{% endfor %}<th>Current Set</th><th>{%if tiebreak %}Tiebreak Score{% else %}Game Score{% endif %}</th></tr>
-            <tr><td>{{p1}}</td>{% for s in set_history %}<td>{{s[0]}}</td>{% endfor %}<th>{{current_set[0]}}</th><th>{% if tiebreak %}{{tie_p1}}{% else %}{{p1_score}}{% endif %}</th></tr>
-            <tr><td>{{p2}}</td>{% for s in set_history %}<td>{{s[1]}}</td>{% endfor %}<th>{{current_set[1]}}</th><th>{% if tiebreak %}{{tie_p2}}{% else %}{{p2_score}}{% endif %}</th></tr>
-        </table>
-     
-    
-        <h2>STATS</h2>
-        <table border="2">
-            <tr><th></th><th>{{p1}}</th><th>{{p2}}</th></tr>
-            <tr><td>Aces</td><td>{{stats.p1_Aces}}</td><td>{{stats.p2_Aces}}</td></tr>
-            <tr><td>Double Faults</td><td>{{stats.p1_Double_Fault}}</td><td>{{stats.p2_Double_Fault}}</td></tr>
-            <tr><td>Serve %</td><td>{{stats.p1_Serve_in}}</td><td>{{stats.p2_Serve_in}}</td></tr>
-            <tr><td>Unforced Errors</td><td>{{stats.p1_UE}}</td><td>{{stats.p2_UE}}</td></tr>
-            <tr><td>Forced Errors</td><td>{{stats.p1_FE}}</td><td>{{stats.p2_FE}}</td></tr>
-            <tr><td>Winners</td><td>{{stats.p1_W}}</td><td>{{stats.p2_W}}</td></tr>
-        </table>
+        <div>
+            <h2>Score</h2>
+            <table border="2">
+                <tr><th></th>{% for s in set_history %}<th>Set {{loop.index}}</th>{% endfor %}<th>Current Set</th><th>{% if tiebreak %}Tiebreak Score{% else %}Game Score{% endif %}</th></tr>
+                <tr><td>{{p1}}</td>{% for s in set_history %}<td>{{s[0]}}</td>{% endfor %}<td>{{current_set[0]}}</td><td>{% if tiebreak %}{{tie_p1}}{% else %}{{p1_score}}{% endif %}</td></tr>
+                <tr><td>{{p2}}</td>{% for s in set_history %}<td>{{s[1]}}</td>{% endfor %}<td>{{current_set[1]}}</td><td>{% if tiebreak %}{{tie_p2}}{% else %}{{p2_score}}{% endif %}</td></tr>
+            </table>
+        </div>
 
-        <script>
-function show(id) {
-    var boxes = ['serve_box', 'unforced_box', 'forced_box', 'winner_box', 'return_box'];
-    for (var i = 0; i < boxes.length; i++) {
-        document.getElementById(boxes[i]).style.display = 'none';
-    }
-    document.getElementById(id).style.display = 'block';
-}
+        <div>
+            <h2>STATS</h2>
+            <table border="2">
+                <tr><th></th><th>{{p1}}</th><th>{{p2}}</th></tr>
+                <tr><td>Aces</td><td>{{stats.p1_Aces}}</td><td>{{stats.p2_Aces}}</td></tr>
+                <tr><td>Double Faults</td><td>{{stats.p1_Double_Fault}}</td><td>{{stats.p2_Double_Fault}}</td></tr>
+                <tr><td>Serve %</td><td>{{stats.p1_Serve_in}}</td><td>{{stats.p2_Serve_in}}</td></tr>
+                <tr><td>Unforced Errors</td><td>{{stats.p1_UE}}</td><td>{{stats.p2_UE}}</td></tr>
+                <tr><td>Forced Errors</td><td>{{stats.p1_FE}}</td><td>{{stats.p2_FE}}</td></tr>
+                <tr><td>Winners</td><td>{{stats.p1_W}}</td><td>{{stats.p2_W}}</td></tr>
+            </table>
+        </div>
+    </div>
 
-function logShot(shotValue) {
-    var player = document.getElementById('pc1').checked
-                 ? document.getElementById('pc1').value
-                 : document.getElementById('pc2').value;
-    document.getElementById('shotField').value = shotValue;
-    document.getElementById('playerField').value = player;
-    document.getElementById('logForm').submit();
-}
-    </script>
-</body>
-    <form action="/report">
+    <form action="/report" method="GET">
         <button name="submit" value="Report">Report</button>
     </form>
+
+    <form action="/finish" method="POST">
+        <button name="finish" value="finish">FINISH MATCH</button>
+    </form>
+
+    <script>
+    function show(id) {
+        var boxes = ['serve_box', 'unforced_box', 'forced_box', 'winner_box', 'return_box'];
+        for (var i = 0; i < boxes.length; i++) {
+            document.getElementById(boxes[i]).style.display = 'none';
+        }
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function logShot(shotValue) {
+        var player = document.getElementById('pc1').checked
+                     ? document.getElementById('pc1').value
+                     : document.getElementById('pc2').value;
+        document.getElementById('shotField').value = shotValue;
+        document.getElementById('playerField').value = player;
+        document.getElementById('logForm').submit();
+    }
+    </script>
 </body>
 </html>
