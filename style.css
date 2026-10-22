@@ -1,37 +1,139 @@
+/* ===== Tennis Analyzer — theme ===== */
+:root {
+    --bg: #eef2f5;
+    --surface: #ffffff;
+    --ink: #1b2733;
+    --muted: #6b7a8d;
+    --line: #dce3ea;
+    --green: #1f8a4c;
+    --green-dark: #166a3a;
+    --ball: #d7f23f;        /* tennis-ball accent */
+    --shadow: 0 2px 10px rgba(20, 40, 60, 0.06), 0 8px 24px rgba(20, 40, 60, 0.05);
+}
+
+* { box-sizing: border-box; }
+
 body {
-    background-color: #e58183;        
-    font-family: Arial, sans-serif;
-    max-width:800px;             
-    margin: 0 auto;                   
-    padding: 200px;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 22px 60px;
+    line-height: 1.5;
 }
 
-table {
-    border-collapse: collapse;        
-    margin-top: 15px;
+/* ---- Headings ---- */
+h1 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
+}
+h1::after {
+    content: "";
+    display: block;
+    width: 64px;
+    height: 5px;
+    margin-top: 10px;
+    background: var(--ball);
+    border-radius: 3px;
+}
+h2 { font-size: 1.15rem; font-weight: 700; margin: 0 0 12px; }
+h3 { font-size: 1rem; font-weight: 700; color: var(--muted);
+     text-transform: uppercase; letter-spacing: 0.06em; margin: 28px 0 12px; }
+h4 { font-size: 0.95rem; font-weight: 700; margin: 4px 0 10px; color: var(--muted); }
+
+/* ---- Server line ---- */
+body > p {
+    display: inline-block;
+    background: var(--ball);
+    color: var(--green-dark);
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin: 8px 0 0;
 }
 
-th, td {
-    padding: 8px 12px;                
-    text-align: left;
-    border: 1px solid #ccc;           
-}
-
-th {
-    background-color: #a55a7d;        
-    color: rgb(33, 16, 148);
-}
-
+/* ---- Buttons (solid green pills by default) ---- */
 button {
-    padding: 8px 14px;
-    margin: 3px;
-    background-color: #1b8855;
-    color: white;
+    font: inherit;
+    font-weight: 600;
+    color: #fff;
+    background: var(--green);
     border: none;
-    border-radius: 4px;               
-    cursor: pointer;                  
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin: 4px 6px 4px 0;
+    cursor: pointer;
+    transition: transform .04s ease, background .15s ease, box-shadow .15s ease;
+}
+button:hover { background: var(--green-dark); box-shadow: var(--shadow); }
+button:active { transform: translateY(1px); }
+
+/* Shot buttons inside the category boxes = lighter, so hierarchy reads */
+div[id$="_box"] button {
+    color: var(--green-dark);
+    background: #eaf5ee;
+    border: 1px solid #cbe5d4;
+}
+div[id$="_box"] button:hover { background: #dcefe3; }
+
+/* Category boxes get a soft card */
+div[id$="_box"] {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    box-shadow: var(--shadow);
 }
 
-button:hover {
-    background-color: #14663f;        
+/* ---- Player radios ---- */
+input[type="radio"] { accent-color: var(--green); transform: scale(1.15); margin-right: 6px; }
+input[type="radio"] + * { margin-right: 18px; }
+
+/* ---- Text inputs (setup page) ---- */
+input[type="text"] {
+    font: inherit;
+    padding: 11px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    margin: 6px 10px 6px 0;
+    min-width: 220px;
 }
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(31, 138, 76, 0.15);
+}
+
+/* ---- Tables (score + stats) ---- */
+table {
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line) !important;
+}
+th, td {
+    padding: 10px 16px;
+    text-align: center;
+    border: 1px solid var(--line);
+}
+th {
+    background: var(--green);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+tr td:first-child, tr th:first-child { text-align: left; font-weight: 600; }
+tbody tr:nth-child(even) td { background: #f7faf8; }
+
+/* Make the live game/tiebreak score column pop */
+table tr td:last-child { font-weight: 800; color: var(--green-dark); }
+
+/* ---- Spacing for the action forms (undo / report / finish) ---- */
+form { display: inline-block; margin: 6px 8px 6px 0; }
