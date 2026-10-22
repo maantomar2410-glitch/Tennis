@@ -20,6 +20,7 @@ def init_db():
 init_db()   
 
 current_match = {}
+history = []
 DEUCE=False
 TIEBRAKE=False
 tie_p1=0
@@ -30,6 +31,7 @@ p1_gc=0
 p2_gc=0
 p1_set=0
 p2_set=0
+server1=False
 set_history=[]
 current_set=[p1_gc, p2_gc]
 game_score=[0,15,30,40,"A"]
@@ -41,9 +43,14 @@ def setup():
 
 @app.route('/start', methods=['POST'])
 def start():
+    history.clear()
     current_match['player1'] = request.form['player1']
     current_match['player2'] = request.form['player2']
-    current_match['server'] = request.form['server']
+    choice = request.form['server']
+    if choice == 'player1':
+        current_match['current_server'] = current_match['player1']
+    else:
+        current_match['current_server'] = current_match['player2']
     return redirect('/track')
 
 SHOT_TYPES = [
@@ -61,7 +68,16 @@ points_won=["Ace", "W_FH", "W_BH", "W_FH_approach", "W_BH_approach",
             "W_FH_volley", "W_BH_volley", "W_overhead", "W_FH_misc", "W_BH_misc",
             "Return_FH_winner", "Return_BH_winner"]
 
-point_neutral = ["Serve_in", "Return_in"] 
+point_neutral = ["Serve_in", "Return_in", "Serve_fault"] 
+
+
+def switch_server():
+    if current_match['current_server'] == current_match['player1']:
+        current_match['current_server'] = current_match['player2']
+    else:
+        current_match['current_server'] = current_match['player1']
+
+
 
 def get_all_stats(p1, p2):
     conn = sqlite3.connect('tennis.db')
@@ -103,19 +119,12 @@ def get_all_stats(p1, p2):
 
     return summary, detailed
 
-
 @app.route('/track')
 def track():     
+    global p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set, DEUCE, TIEBRAKE, tie_p1, tie_p2 , set_history , current_set , server1
     p1=current_match['player1']
     p2=current_match['player2']
-    server_choice = current_match['server']
-
-    if server_choice == 'player1':
-        current_match['server'] = current_match['player1']
-    elif server_choice == 'player2':
-        current_match['server'] = current_match['player2']
-
-    server=current_match['server']
+    server=current_match['current_server']       # ← just read it, no conversion
 
     summary,detailed=get_all_stats(p1, p2)
     player1_score=game_score[p1_gs] 
@@ -123,12 +132,11 @@ def track():
     set_score_p1=p1_gc
     set_score_p2=p2_gc
 
-
-    return render_template('home.html', p1=p1, p2=p2, server=server, stats=summary, p1_score=player1_score, p2_score=player2_score, tie_p1=tie_p1, tie_p2=tie_p2,set_history=set_history, p1_gc=set_score_p1, p2_gc=set_score_p2,current_set=current_set, tiebreak=TIEBRAKE)
+    return render_template('home.html', p1=p1, p2=p2, server=server, stats=summary, p1_score=player1_score, p2_score=player2_score, tie_p1=tie_p1, tie_p2=tie_p2, set_history=set_history, p1_gc=set_score_p1, p2_gc=set_score_p2, current_set=current_set, tiebreak=TIEBRAKE, server1=server1)
     
 
 def update_score(shot, player):
-    global p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set, DEUCE, TIEBRAKE, tie_p1, tie_p2 , set_history , current_set
+    global p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set, DEUCE, TIEBRAKE, tie_p1, tie_p2 , set_history , current_set , starter
 
     p1name = current_match['player1']
 
@@ -141,6 +149,9 @@ def update_score(shot, player):
         winner = current_match['player2'] if player == p1name else p1name
 
     if TIEBRAKE:
+        total_points = tie_p1 + tie_p2
+        if total_points % 2 == 0:
+            switch_server()
         if winner == p1name:
             tie_p1 += 1
         else:
@@ -153,6 +164,10 @@ def update_score(shot, player):
             tie_p1 = tie_p2 = 0
             p1_gc = p2_gc = 0
             current_set=[p1_gc, p2_gc]
+            if starter == p1name:
+                current_match['current_server'] = current_match['player2']
+            else:
+                current_match['current_server'] = current_match['player1']
 
             TIEBRAKE = False
         elif tie_p2 >= 7 and tie_p2 - tie_p1 >= 2:
@@ -163,6 +178,10 @@ def update_score(shot, player):
             p1_gc = p2_gc = 0
             current_set=[p1_gc, p2_gc]
             TIEBRAKE = False
+            if starter == p1name:
+                current_match['current_server'] = current_match['player2']  
+            else:
+                current_match['current_server'] = current_match['player1']
         return      
 
     if DEUCE:
@@ -171,6 +190,7 @@ def update_score(shot, player):
                 p1_gc += 1
                 current_set=[p1_gc, p2_gc]
                 p1_gs = p2_gs = 0
+                switch_server()
                 DEUCE = False
             elif p2_gs == 4:              # P2 had adv, P1 wins → back to deuce
                 p1_gs = p2_gs = 3
@@ -181,6 +201,7 @@ def update_score(shot, player):
                 p2_gc += 1
                 current_set=[p1_gc, p2_gc]
                 p1_gs = p2_gs = 0
+                switch_server()
                 DEUCE = False
             elif p1_gs == 4:              # P1 had adv, P2 wins → back to deuce
                 p1_gs = p2_gs = 3
@@ -193,6 +214,7 @@ def update_score(shot, player):
                 p1_gc += 1
                 current_set=[p1_gc, p2_gc]
                 p1_gs = p2_gs = 0
+                switch_server()
             else:
                 p1_gs += 1
         else:
@@ -200,6 +222,8 @@ def update_score(shot, player):
                 p2_gc += 1
                 current_set=[p1_gc, p2_gc]
                 p1_gs = p2_gs = 0
+                switch_server()
+
             else:
                 p2_gs += 1
 
@@ -211,44 +235,75 @@ def update_score(shot, player):
         p1_set += 1
         set_history.append([p1_gc, p2_gc])
         p1_gc = p2_gc = 0
+        switch_server()
         current_set=[p1_gc, p2_gc]
     if p2_gc >= 6 and p2_gc - p1_gc >= 2:
         p2_set += 1
         set_history.append([p1_gc, p2_gc])
         p1_gc = p2_gc = 0
+        switch_server()
         current_set=[p1_gc, p2_gc]
 
 
     if p1_gc == 6 and p2_gc == 6:
         TIEBRAKE = True
+        starter=current_match['current_server']
+          
 
 
 
 @app.route('/log', methods=['POST'])
 def log_shot():
-    shot = request.form['shot']          
-    player = request.form['player']   
- 
+    shot = request.form['shot']
+    player = request.form['player']
 
-    conn = sqlite3.connect('tennis.db')  
+    # snapshot the state BEFORE applying the point (for undo)
+    history.append({
+        'p1_gs': p1_gs, 'p2_gs': p2_gs,
+        'p1_gc': p1_gc, 'p2_gc': p2_gc,
+        'p1_set': p1_set, 'p2_set': p2_set,
+        'DEUCE': DEUCE, 'TIEBRAKE': TIEBRAKE,
+        'tie_p1': tie_p1, 'tie_p2': tie_p2,
+        'current_set': current_set[:],                     # copy the list
+        'set_history': [row[:] for row in set_history],    # copy list + inner lists
+        'server': current_match['current_server'],
+        'tiebreak_starter': current_match.get('tiebreak_starter'),
+    })
+
+    conn = sqlite3.connect('tennis.db')
     cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO shots (shot_type, player) VALUES (?, ?)",   
-        (shot, player)
-    )
-    conn.commit()                        
-    conn.close()    
-    update_score(shot, player)  # Update the score based on the shot and player
-    
-    return redirect('/track')  
+    cursor.execute("INSERT INTO shots (shot_type, player) VALUES (?, ?)", (shot, player))
+    conn.commit()
+    conn.close()
+
+    update_score(shot, player)
+    return redirect('/track')
 
 @app.route('/undo', methods=['POST'])
 def undo():
-    conn=sqlite3.connect('tennis.db')  
-    cursor=conn.cursor()
+    global p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set, DEUCE, TIEBRAKE, tie_p1, tie_p2, set_history, current_set
+
+    if not history:
+        return redirect('/track')          # nothing to undo
+
+    # 1) remove the last shot from the DB — stats fix themselves
+    conn = sqlite3.connect('tennis.db')
+    cursor = conn.cursor()
     cursor.execute("DELETE FROM shots WHERE id = (SELECT MAX(id) FROM shots)")
     conn.commit()
     conn.close()
+
+    # 2) pop the pre-point snapshot and restore score + server
+    snap = history.pop()
+    p1_gs = snap['p1_gs']; p2_gs = snap['p2_gs']
+    p1_gc = snap['p1_gc']; p2_gc = snap['p2_gc']
+    p1_set = snap['p1_set']; p2_set = snap['p2_set']
+    DEUCE = snap['DEUCE']; TIEBRAKE = snap['TIEBRAKE']
+    tie_p1 = snap['tie_p1']; tie_p2 = snap['tie_p2']
+    current_set = snap['current_set']
+    set_history = snap['set_history']
+    current_match['server'] = snap['server']
+    current_match['tiebreak_starter'] = snap['tiebreak_starter']
 
     return redirect('/track')
 
@@ -260,6 +315,30 @@ def report():
     summary,detailed=get_all_stats(p1,p2)
 
     return render_template('report.html', p1=p1, p2=p2, detailed=detailed)
+
+
+
+@app.route('/finish', methods=["POST"])
+def finish():
+    global DEUCE, TIEBRAKE, tie_p1, tie_p2, p1_gs, p2_gs, p1_gc, p2_gc, p1_set, p2_set, set_history, current_set
+
+    conn = sqlite3.connect('tennis.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM shots")
+    conn.commit()
+    conn.close()
+
+    DEUCE = False
+    TIEBRAKE = False
+    tie_p1 = tie_p2 = 0
+    p1_gs = p2_gs = 0
+    p1_gc = p2_gc = 0
+    p1_set = p2_set = 0
+    set_history = []
+    current_set = [0, 0]
+    history.clear()
+
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True)
